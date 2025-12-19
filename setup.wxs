@@ -1,0 +1,99 @@
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="72682B70-4EF0-4209-B134-4CC196E2817B" UpgradeCode="CE5672C5-27B0-4F8E-B548-04496C271ADF" Version="1.0.0.0" Language="1033" Name="Soundphone" Manufacturer="Zohan Haque">
+    <Package InstallerVersion="200" InstallScope="perMachine" InstallPrivileges="elevated" Compressed="yes" Manufacturer="SoundPhone" />
+    <Media EmbedCab="yes" Cabinet="media1.cab" Id="1" />
+    <Icon Id="MyIcon" SourceFile="Icon1.ico" />
+    <WixVariable Id="WixUIDialogBmp" Value="Idkwhattonamethis.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="Idkwhattonamehimeither.bmp" />
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    <Property Id="ARPPRODUCTICON" Value="MyIcon" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="MenuAppFolder" Name="Soundphone" />
+      </Directory>
+      <Directory Id="DesktopFolder" Name="Desktop" />
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="MyAppFolder" Name="Soundphone" />
+      </Directory>
+    </Directory>
+
+    <!-- ComponentGroups -->
+    <ComponentGroup Id="RemoveFolders">
+      <ComponentRef Id="Remove.MenuAppFolder" />
+      <ComponentRef Id="Remove.ProgramFilesFolder" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="Files">
+      <ComponentRef Id="CId542DB5A4" />
+      <ComponentRef Id="CId23F0C2E2" />
+      <ComponentRef Id="CIdC36C84B8" />
+      <ComponentRef Id="CSCIdA7A73CCD" />
+      <ComponentRef Id="CSCIdDBDC1330" />
+    </ComponentGroup>
+
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="Main" Description="Nothing to do, just dont disable it this wont install the app then">
+      <ComponentGroupRef Id="RemoveFolders" />
+      <ComponentGroupRef Id="Files" />
+    </Feature>
+
+    <UIRef Id="WixUI_FeatureTree" />
+
+    <!-- Program Files Components -->
+    <DirectoryRef Id="ProgramFilesFolder">
+      <Component Id="Remove.ProgramFilesFolder" Guid="79A2FF85-4372-4945-BBFB-892FD7747B7C">
+        <RemoveFolder Id="ProgramFilesFolder" On="uninstall" />
+        <RegistryValue Root="HKMU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="MyAppFolder">
+      <Component Id="CId542DB5A4" Guid="BBC637D0-8995-44BB-87DF-E090D33CB451" Win64="no">
+        <File Id="FId7235C7FF" Name="icon1.png" Source="C:\Users\zohan\OneDrive\Desktop\dist\Soundphone\icon1.png" KeyPath="yes" />
+      </Component>
+      <Component Id="CId23F0C2E2" Guid="DA590019-3D64-4BC3-9618-23A245273787" Win64="no">
+        <File Id="FId983AB6FD" Name="internal.zip" Source="C:\Users\zohan\OneDrive\Desktop\dist\Soundphone\internal.zip" KeyPath="yes" />
+      </Component>
+      <Component Id="CIdC36C84B8" Guid="69345FF4-4FBD-4BEF-94D0-A989E93169C2" Win64="no">
+        <File Id="FIdFD4E7B65" Name="Soundphone.exe" Source="C:\Users\zohan\OneDrive\Desktop\dist\Soundphone\Soundphone.exe" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <!-- Desktop Shortcut -->
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="CSCIdA7A73CCD" Guid="68A66D05-9CD8-4482-9F8D-EC7263A3564D">
+        <Shortcut Id="SIdEE48F8FC" Name="Soundphone" Description="Play sounds from the internet and also files" Target="[!FIdFD4E7B65]" WorkingDirectory="MyAppFolder" Icon="MyIcon" />
+        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+        <RemoveFolder Id="CSCIdA7A73CCD" On="uninstall" Directory="DesktopFolder" />
+      </Component>
+    </DirectoryRef>
+
+    <!-- Start Menu Shortcut -->
+    <DirectoryRef Id="ProgramMenuFolder">
+      <Component Id="CSCIdDBDC1330" Guid="74156A13-AA58-41E3-A8ED-9E75A103C423">
+        <Shortcut Id="SId857178F4" Name="Soundphone" Description="Play sounds from the internet and also files" Target="[!FIdFD4E7B65]" WorkingDirectory="MyAppFolder" Icon="MyIcon" />
+        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+        <RemoveFolder Id="CSCIdDBDC1330" Directory="ProgramMenuFolder" On="uninstall" />
+      </Component>
+    </DirectoryRef>
+
+    <!-- Remove Menu App Folder -->
+    <DirectoryRef Id="MenuAppFolder">
+      <Component Id="Remove.MenuAppFolder" Guid="2118A1BD-8BD8-4CEF-85A1-1469711882B2">
+        <RemoveFolder Id="MenuAppFolder" On="uninstall" />
+        <RegistryValue Root="HKMU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <!-- CustomAction for extracting internal.zip -->
+    <CustomAction Id="ExtractInternalZip" Directory="MyAppFolder" Execute="deferred" Impersonate="no" Return="ignore"
+                  ExeCommand='cmd /c "mkdir _internal &amp; tar -xf internal.zip -C _internal"' />
+
+    <!-- Schedule the CustomAction -->
+    <InstallExecuteSequence>
+      <Custom Action="ExtractInternalZip" After="InstallFiles">NOT Installed</Custom>
+    </InstallExecuteSequence>
+
+  </Product>
+</Wix>
